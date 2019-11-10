@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -36,15 +38,26 @@ namespace Sun
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
-            app.UseRouting();
+            // app.UseRouting();
 
-            app.UseAuthorization();
+            // app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
+            // app.UseEndpoints(endpoints =>
+            // {
+            //     endpoints.MapControllers();
+            // });
+
+            // app.UseMvc();
+            app.UseDefaultFiles();
+            app.UseStaticFiles();
+            app.Run(async (context) =>
             {
-                endpoints.MapControllers();
+                if (!Path.HasExtension(context.Request.Path.Value))
+                {
+                    await context.Response.SendFileAsync(Path.Combine(env.WebRootPath, "index.html"));
+                }
             });
         }
     }
