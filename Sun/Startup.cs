@@ -28,9 +28,23 @@ namespace Sun
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers()
-                .AddNewtonsoftJson(options => {
+                .AddNewtonsoftJson(options =>
+                {
                     options.SerializerSettings.ContractResolver = new Newtonsoft.Json.Serialization.DefaultContractResolver();
                 });
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder
+                        .AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                );
+            });
+            // services.Configure<MvcOptions>(options =>
+            // {
+            //     options.Filters.Add(new CorsAuthorizationFilterFactory("CorsPolicy"));
+            // });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,6 +61,7 @@ namespace Sun
 
             app.UseAuthorization();
 
+            app.UseCors("CorsPolicy");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
@@ -55,6 +70,7 @@ namespace Sun
             // app.UseMvc();
             app.UseDefaultFiles();
             app.UseStaticFiles();
+            
             app.Run(async (context) =>
             {
                 if (!Path.HasExtension(context.Request.Path.Value))
